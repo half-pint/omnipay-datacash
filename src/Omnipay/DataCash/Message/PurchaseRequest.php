@@ -34,6 +34,36 @@ class PurchaseRequest extends AbstractRequest
         return $this->setParameter('password', $value);
     }
 
+    public function setVerify($value)
+    {
+        return $this->setParameter('verify',$value);
+    }
+
+    public function getVerify()
+    {
+        return $this->getParameter('verify');
+    }
+
+    public function getMerchantUrl()
+    {
+        return $this->getParameter('merchant_url');
+    }
+
+    public function setMerchantUrl($value)
+    {
+        return $this->setParameter('merchant_url', $value);
+    }
+
+    public function getPurchaseDesc()
+    {
+        return $this->getParameter('purchase_desc');
+    }
+
+    public function setPurchaseDesc($value)
+    {
+        return $this->setParameter('purchase_desc', $value);
+    }
+
     public function getData()
     {
         $this->validate('amount', 'card', 'transactionId');
@@ -50,6 +80,11 @@ class PurchaseRequest extends AbstractRequest
 
         $data->Transaction->CardTxn->Card->pan = $this->getCard()->getNumber();
         $data->Transaction->CardTxn->Card->expirydate = $this->getCard()->getExpiryDate('m/y');
+
+        $data->Transaction->TxnDetails->ThreeDSecure->verify = $this->getVerify();
+        $data->Transaction->TxnDetails->ThreeDSecure->merchant_url =  $this->getMerchantUrl();
+        $data->Transaction->TxnDetails->ThreeDSecure->purchase_datetime = date("Ymd H:i:s");
+        $data->Transaction->TxnDetails->ThreeDSecure->purchase_desc = $this->getPurchaseDesc();
 
         $data->Transaction->CardTxn->method = 'auth';
 

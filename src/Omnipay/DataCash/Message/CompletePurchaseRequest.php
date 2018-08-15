@@ -10,13 +10,48 @@ use Omnipay\Common\Exception\InvalidResponseException;
  */
 class CompletePurchaseRequest extends PurchaseRequest
 {
+    public function getPaRes()
+    {
+        return $this->getParameter('pa_res');
+    }
+
+    public function setPaRes($value)
+    {
+        return $this->setParameter('pa_res', $value);
+    }
+
+    public function getDatacashRef()
+    {
+        return $this->getParameter('datacash_ref');
+    }
+
+    public function setDatacashRef($value)
+    {
+        return $this->setParameter('datacash_ref', $value);
+    }
+
     public function getData()
     {
-        return $this->httpRequest->request->all();
+        $data = new SimpleXMLElement('<Request/>');
+
+        $data->Authentication->client = $this->getMerchantId();
+        $data->Authentication->password = $this->getPassword();
+
+        $data->Transaction->HistoricTxn->method = 'threedsecure_authorization_request';
+        $data->Transaction->HistoricTxn->reference = $this->getDatacashRef();
+
+        $data->Transaction->HistoricTxn->pares_message = $this->getPaRes();
+
+        return $data;
     }
 
     public function sendData($data)
     {
-        return $this->response = new Response($this, $data);
+        // post to DataCash
+        $xml = $data->saveXML();
+
+        $httpResponse = $this->httpClient->post($this->getEndpoint(), null, $xml)->send();
+
+        return $this->response = new Response($this, $httpResponse->getBody());
     }
 }

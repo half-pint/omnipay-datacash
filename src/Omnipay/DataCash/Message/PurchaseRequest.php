@@ -64,6 +64,16 @@ class PurchaseRequest extends AbstractRequest
         return $this->setParameter('purchase_desc', $value);
     }
 
+    public function getCaptureMethod()
+    {
+        return $this->getParameter('capturemethod');
+    }
+
+    public function setCaptureMethod($value)
+    {
+        return $this->setParameter('capturemethod', $value);
+    }
+
     public function getData()
     {
         $this->validate('amount', 'card', 'transactionId');
@@ -77,6 +87,7 @@ class PurchaseRequest extends AbstractRequest
         $data->Transaction->TxnDetails->amount = $this->getAmount();
         $data->Transaction->TxnDetails->amount->addAttribute('currency', $this->getCurrency());
         $data->Transaction->TxnDetails->merchantreference = $this->getTransactionId();
+        $data->Transaction->TxnDetails->capturemethod = "ecomm";
 
         $data->Transaction->CardTxn->Card->pan = $this->getCard()->getNumber();
         $data->Transaction->CardTxn->Card->expirydate = $this->getCard()->getExpiryDate('m/y');
